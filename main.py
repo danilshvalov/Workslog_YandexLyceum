@@ -91,7 +91,7 @@ def add_work():
         session = db_session.create_session()
         jobs = Jobs()
         jobs.job = form.job.data
-        jobs.team_leader = form.team_leader.data
+        jobs.team_leader = current_user.id
         jobs.work_size = form.work_size.data
         jobs.collaborators = form.collaborators.data
         jobs.is_finished = form.is_finished.data
@@ -108,10 +108,10 @@ def edit_works_log(id):
     form = AddWork()
     if request.method == "GET":
         session = db_session.create_session()
-        jobs = session.query(Jobs).filter(Jobs.id == id).first()
+        jobs = session.query(Jobs).filter(Jobs.id == id, ((Jobs.team_leader == current_user.id) |
+                                                          (current_user.id == 1))).first()
         if jobs:
             form.job.data = jobs.job
-            form.team_leader.data = jobs.team_leader
             form.work_size.data = jobs.work_size
             form.collaborators.data = jobs.collaborators
             form.is_finished.data = jobs.is_finished
@@ -119,10 +119,10 @@ def edit_works_log(id):
             abort(404)
     if form.validate_on_submit():
         session = db_session.create_session()
-        jobs = session.query(Jobs).filter(Jobs.id == id).first()
+        jobs = session.query(Jobs).filter(Jobs.id == id, ((Jobs.team_leader == current_user.id) |
+                                                          (current_user.id == 1))).first()
         if jobs:
             jobs.job = form.job.data
-            jobs.team_leader = form.team_leader.data
             jobs.work_size = form.work_size.data
             jobs.collaborators = form.collaborators.data
             jobs.is_finished = form.is_finished.data
@@ -137,7 +137,8 @@ def edit_works_log(id):
 @login_required
 def works_delete(id):
     session = db_session.create_session()
-    jobs = session.query(Jobs).filter(Jobs.id == id).first()
+    jobs = session.query(Jobs).filter(Jobs.id == id, ((Jobs.team_leader == current_user.id) |
+                                                      (current_user.id == 1))).first()
     if jobs:
         session.delete(jobs)
         session.commit()
