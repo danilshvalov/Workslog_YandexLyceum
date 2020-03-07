@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request, abort
 from flask_login import login_user
 from data import db_session
 from data.users import User
@@ -46,7 +46,14 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
-        user = User(name=form.name.data, email=form.email.data)
+        user = User()
+        user.email = form.email.data
+        user.surname = form.surname.data
+        user.name = form.name.data
+        user.age = form.age.data
+        user.position = form.position.data
+        user.speciality = form.speciality.data
+        user.address = form.address.data
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
@@ -88,10 +95,56 @@ def add_work():
         jobs.work_size = form.work_size.data
         jobs.collaborators = form.collaborators.data
         jobs.is_finished = form.is_finished.data
-        session.add(jobs)
+        current_user.jobs.append(jobs)
+        session.merge(current_user)
         session.commit()
         return redirect('/works_log')
     return render_template('add_work.html', title='Добавление работы', form=form)
+
+
+@app.route('/works_log/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_works_log(id):
+    form = AddWork()
+    if request.method == "GET":
+        session = db_session.create_session()
+        jobs = session.query(Jobs).filter(Jobs.id == id).first()
+        if jobs:
+            form.job.data = jobs.job
+            form.team_leader.data = jobs.team_leader
+            form.work_size.data = jobs.work_size
+            form.collaborators.data = jobs.collaborators
+            form.is_finished.data = jobs.is_finished
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        jobs = session.query(Jobs).filter(Jobs.id == id).first()
+        if jobs:
+            jobs.job = form.job.data
+            jobs.team_leader = form.team_leader.data
+            jobs.work_size = form.work_size.data
+            jobs.collaborators = form.collaborators.data
+            jobs.is_finished = form.is_finished.data
+            session.commit()
+            return redirect('/works_log')
+        else:
+            abort(404)
+    return render_template('add_work.html', title='Редактирование новости', form=form)
+
+
+@app.route('/works_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def works_delete(id):
+    session = db_session.create_session()
+    jobs = session.query(Jobs).filter(Jobs.id == id,
+                                      Jobs.user == current_user).first()
+    if jobs:
+        session.delete(jobs)
+        session.commit()
+    else:
+        abort(404)
+    return redirect('/works_log')
 
 
 def main():

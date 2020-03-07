@@ -3,6 +3,7 @@ import sqlalchemy
 from flask_login import UserMixin
 from .db_session import SqlAlchemyBase
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy import orm
 
 
 class User(SqlAlchemyBase, UserMixin):
@@ -26,3 +27,4 @@ class User(SqlAlchemyBase, UserMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                       default=datetime.datetime.now)
+    jobs = orm.relation("Jobs", back_populates='user')
