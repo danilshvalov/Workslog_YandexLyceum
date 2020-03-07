@@ -4,7 +4,6 @@ from .db_session import SqlAlchemyBase
 
 class Departments(SqlAlchemyBase):
     __tablename__ = 'departments'
-
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            sqlalchemy.ForeignKey("users.id"))
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
