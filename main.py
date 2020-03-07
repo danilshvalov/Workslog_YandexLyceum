@@ -137,8 +137,7 @@ def edit_works_log(id):
 @login_required
 def works_delete(id):
     session = db_session.create_session()
-    jobs = session.query(Jobs).filter(Jobs.id == id,
-                                      Jobs.user == current_user).first()
+    jobs = session.query(Jobs).filter(Jobs.id == id).first()
     if jobs:
         session.delete(jobs)
         session.commit()
