@@ -5,8 +5,24 @@
 {% for item in job%}
 <h2>Action # {{ loop.index }}</h2>
 <table width="100%">
-    <tr style="background-color: #dddddd" align="center"><td width="400px">Title of activity</td><td width="150px">Team leader</td><td width="150px">Duration</td><td width="250px">List of collaborators</td><td>Is finished</td></tr>
-    <tr style="background-color: #eeeeff" align="center"><td>{{ item.job }}</td><td>{{ item.user.surname }} {{ item.user.name }}</td><td>{{ item.work_size }} hours</td><td>{{ item.collaborators }}</td>{% if item.is_finished == True %} <td style="background-color: #fcffee">Is <br> finished</td> {% else %} <td style="background-color: #ffeeff"> Is not <br> finished</td> {% endif %}</tr>
+    <tr style="background-color: #dddddd" align="center">
+        <td width="400px">Title of activity</td>
+        <td width="150px">Team leader</td>
+        <td width="150px">Duration</td>
+        <td width="250px">List of collaborators</td>
+        <td>Is finished</td>
+    </tr>
+    <tr style="background-color: #eeeeff" align="center">
+        <td>{{ item.job }}</td>
+        <td>{{ item.user.surname }} {{ item.user.name }}</td>
+        <td>{{ item.work_size }} hours</td>
+        <td>{{ item.collaborators }}</td>
+        {% if item.is_finished == True %}
+        <td style="background-color: #fcffee">Is <br> finished</td>
+        {% else %}
+        <td style="background-color: #ffeeff"> Is not <br> finished</td>
+        {% endif %}
+    </tr>
 </table>
 <br>
 {% endfor %}
