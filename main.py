@@ -4,9 +4,10 @@ from data import db_session
 from data.users import User
 from data.jobs import Jobs
 import datetime
-from flask_login import LoginManager, login_required, logout_user
+from flask_login import LoginManager, login_required, logout_user, current_user
 from data.login_form import LoginForm
 from data.register_form import RegisterForm
+from data.add_work_form import AddWork
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -73,6 +74,24 @@ def login():
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/add_work', methods=['GET', 'POST'])
+@login_required
+def add_work():
+    form = AddWork()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        jobs = Jobs()
+        jobs.job = form.job.data
+        jobs.team_leader = form.team_leader.data
+        jobs.work_size = form.work_size.data
+        jobs.collaborators = form.collaborators.data
+        jobs.is_finished = form.is_finished.data
+        session.add(jobs)
+        session.commit()
+        return redirect('/works_log')
+    return render_template('add_work.html', title='Добавление работы', form=form)
 
 
 def main():
